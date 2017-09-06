@@ -49,6 +49,9 @@ osc = OSC.OSCServer( receive_address )
 # add handlers
 osc.addMsgHandler( "/sensenode/address", handler_serial )  
 
-while True:
-  osc.handle_request()
-  time.sleep(0.001)
+thread = threading.Thread( target = osc.serve_forever )
+thread.start()
+    
+#while True:
+  #osc.handle_request()
+  #time.sleep(0.001)
