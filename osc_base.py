@@ -4,7 +4,6 @@
 hostport = 57120 ## where the OSC goes
 ###
 hostip = "127.0.0.1"
-
 myip = "127.0.0.1"
 myport = 57400
 ###
@@ -48,7 +47,7 @@ osc = OSC.OSCServer( receive_address )
 
 # add handlers
 osc.addMsgHandler( "/sensenode/address", handler_serial )  
-
-while True:
+stopOSC = false
+while True and not stopOSC:
   osc.handle_request()
   time.sleep(0.001)
