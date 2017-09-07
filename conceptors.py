@@ -194,19 +194,34 @@ class MyServer(ServerThread):
     def __init__(self, onMorph):
         ServerThread.__init__(self, 57400)
         self.onMorph = onMorph
+        print("server created")
+
+        try:
+            self.target = Address(57120)
+        except AddressError as err:
+            print (str(err))
+            sys.exit()
+
 
     @make_method('/morph', 'f')
     def morph_callback(self, path, args):
         f = args[0]
 #        print("received message ",path," with arguments: ", f)
-        self.onMorph(f)
-        print("morph")
+        value = self.onMorph(f)
+        send(self.target, "/output", value)
+
+    @make_method('/test', None)
+    def test_callback(self, path, args):
+#        print("received message ",path," with arguments: ", f)
+        print("test")
 
     @make_method(None, None)
     def fallback(self, path, args):
-        print("received unknown message ", s)
+        print("received unknown message ", path)
+
 
 def makeOSCServer(onMorph):
+    global server
     try:
         server.free()
     except:
