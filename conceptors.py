@@ -48,18 +48,17 @@ maxVal = np.max(rawp)
 minVal = np.min(rawp)
 rp = 0.5 * (2 * (rawp - minVal) / (maxVal - minVal) - 1);
 pJ2 = lambda n: rp[mod(n, period2 )]
-pTri = lambda n,p: (n % p) * floor(n % (2*p))
+pTri = lambda n,p: (((n % p) >= (p/2)) * ((p/2) - (n % (p/2))) + ((n % p) < (p/2)) * (n % (p/2))) * (2/p)
 
 
 
 # make a network
 # p is a set of parameters
 def makeNetwork(p):
-    figsize(20,2)
     signalPlotLength = 15
    # pattern readout learning
     patterns = np.array([1,2])
-    
+
     Netconnectivity = 1
     if p['N'] > 20:
         Netconnectivity = 10.0/p['N'];
@@ -67,34 +66,34 @@ def makeNetwork(p):
     WinRaw = np.random.randn(p['N'], 1)
     WbiasRaw = np.random.randn(p['N'], 1)
 
-    #Scale raw weights     
+    #Scale raw weights
     Wstar = p['NetSR'] * WstarRaw;
     Win = p['NetinpScaling'] * WinRaw;
-    Wbias = p['BiasScaling'] * WbiasRaw;  
+    Wbias = p['BiasScaling'] * WbiasRaw;
     I = np.eye(p['N'])
     xCollector = np.zeros((p['N'], p['learnLengthWout']))
     pCollector = np.zeros((1, p['learnLengthWout']))
     x = np.zeros((p['N'],1))
-    
-    
+
+
     for n in arange(p['washoutLength'] + p['learnLength']):
         u = np.random.randn() * 1.5
         x = np.tanh((Wstar * x) + (Win * u + Wbias))
         if n >= p['washoutLength']:
             xCollector[:, n - p['washoutLength']] = x[:,0]
             pCollector[0, n - p['washoutLength']] = u
-                       
+
 #     print("Mean/Max/Min Activations, random network driven by noise")
 #     plot(np.mean(xCollector.T, axis=1))
 #     plot(np.max(xCollector.T, axis=1))
 #     plot(np.min(xCollector.T, axis=1))
-    
-    Wout = linalg.inv(xCollector.dot(xCollector.conj().T) +  
+
+    Wout = linalg.inv(xCollector.dot(xCollector.conj().T) +
                   (p['TychonovAlphaReadout'] * np.eye(p['N']))).dot(xCollector).dot(pCollector.conj().transpose()).conj().T
     print("Initial training")
     print("NRMSE: ", nrmse(Wout.dot(xCollector), pCollector))
     print("absWeight: ", mean(abs(Wout)))
-    
+
     allTrainArgs = np.zeros((p['N'], p['patts'].size * p['learnLength']))
     allTrainOldArgs = np.zeros((p['N'], p['patts'].size * p['learnLength']))
     allTrainTargs = np.zeros((p['N'], p['patts'].size * p['learnLength']))
@@ -131,29 +130,29 @@ def makeNetwork(p):
         patternRs[0,i_pattern] = R
 
         startXs[:,i_pattern] = x[:,0]
-        
+
         #needed?
         train_xPL[0,i_pattern] = xCollector[:,:signalPlotLength]
         train_pPL[0,i_pattern] = pCollector[0,:signalPlotLength]
         ###
-        
+
         allTrainArgs[:, i_pattern * p['learnLength']:(i_pattern+1) * p['learnLength']] = xCollector
         allTrainOldArgs[:, i_pattern * p['learnLength']:(i_pattern+1) * p['learnLength']] = xOldCollector
         allTrainOuts[0, i_pattern * p['learnLength']:(i_pattern+1) * p['learnLength']] = pCollector
         allTrainTargs[:, i_pattern * p['learnLength']:(i_pattern+1) * p['learnLength']] = Win.dot(pCollector)
-         
+
     Wtargets = np.arctanh(allTrainArgs) - np.tile( Wbias, (1, p['patts'].size * p['learnLength']))
 
     W = linalg.inv(allTrainOldArgs.dot(allTrainOldArgs.conj().T) +
                       (p['TychonovAlpha'] * np.eye(p['N']))).dot(allTrainOldArgs).dot(Wtargets.conj().T).conj().T
     print("W NMRSE: ", mean(nrmse(W.dot(allTrainOldArgs), Wtargets)))
     print("absSize: ", mean(mean(abs(W), axis=0)))
-    
-    figure(1)
-    plot(np.mean(W.dot(allTrainOldArgs).T, axis=1))
+
+    # figure(1)
+    # plot(np.mean(W.dot(allTrainOldArgs).T, axis=1))
 
     print('Computing conceptors')
-    
+
     Cs = np.zeros((4, p['patts'].size), dtype=np.object)
     for i_pattern in range(p['patts'].size):
         R = patternRs[0,i_pattern]
@@ -178,11 +177,11 @@ def makeNetwork(p):
             if (n > p['washoutLength']):
                 x_CTestPL[:,n-p['washoutLength'],i_pattern] = x[0:3].T
                 p_CTestPL[:,n-p['washoutLength'],i_pattern] = Wout.dot(x)
-    for i_pattern in range(p['patts'].size):
-        figure(2 + i_pattern)
-        plot(p_CTestPL[:,:,i_pattern].T)
-        plot([p['patts'][i_pattern](x) for x in arange(p['recallTestLength'])])
-        
+    # for i_pattern in range(p['patts'].size):
+    #     figure(2 + i_pattern)
+    #     plot(p_CTestPL[:,:,i_pattern].T)
+    #     plot([p['patts'][i_pattern](x) for x in arange(p['recallTestLength'])])
+
     return locals()
 
 ##### OSC server ####
@@ -190,44 +189,47 @@ def makeNetwork(p):
 from liblo import *
 import sys
 
-try:
-    server.free()
-except:
-    pass
 
 class MyServer(ServerThread):
-    def __init__(self):
+    def __init__(self, onMorph):
         ServerThread.__init__(self, 57400)
+        self.onMorph = onMorph
 
     @make_method('/morph', 'f')
     def morph_callback(self, path, args):
         f = args[0]
-        print("received message ",path," with arguments: ", f)
-        global morph_factor
-        morph_factor = f
-    
+#        print("received message ",path," with arguments: ", f)
+        self.onMorph(f)
+        print("morph")
+
     @make_method(None, None)
     def fallback(self, path, args):
         print("received unknown message ", s)
 
-try:
-    server = MyServer()
-except err:
-    print(str(err))
+def makeOSCServer(onMorph):
+    try:
+        server.free()
+    except:
+        pass
 
-server.start()
+    try:
+        server = MyServer(onMorph)
+        print("server running")
+    except err:
+        print(str(err))
+
+    server.start()
 
 
 
 
 ## in notebook:
 
-params = {'N':30, 'NetSR':1.6, 'NetinpScaling':1.6,'BiasScaling':0.3,'TychonovAlpha':0.0001,
-         'washoutLength':100, 'learnLength':500, 'TychonovAlphaReadout':0.0001,
-         'learnLengthWout':500, 'recallTestLength':100,
-         'alphas':np.array([12.0,24.0]),
-          'patts':np.array([pJ1b, pJ2])
-         }
-
-net = makeNetwork(params)
-
+# params = {'N':30, 'NetSR':1.6, 'NetinpScaling':1.6,'BiasScaling':0.3,'TychonovAlpha':0.0001,
+#          'washoutLength':100, 'learnLength':500, 'TychonovAlphaReadout':0.0001,
+#          'learnLengthWout':500, 'recallTestLength':100,
+#          'alphas':np.array([12.0,24.0]),
+#           'patts':np.array([pJ1b, pJ2])
+#          }
+#
+# net = makeNetwork(params)
