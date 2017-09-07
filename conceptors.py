@@ -13,7 +13,7 @@ def nrmse(output,target):
     return np.sqrt(np.mean(errorSignal ** 2) / combinedVar)
 
 # generates internal weights for the network
-# nInternalUnits: how many units
+# nInternalUnits: how many units N x N
 # connectivity: percentage of connections
 def generateInternalWeights(nInternalUnits, connectivity):
     success = False
@@ -21,23 +21,19 @@ def generateInternalWeights(nInternalUnits, connectivity):
     while success == False:
         try:
             internalWeights = np.random.randn(nInternalUnits,nInternalUnits) * (np.random.random((nInternalUnits,nInternalUnits)) < connectivity)
-            specRad = abs(np.linalg.eig(internalWeights)[0][0])
-            if (specRad > 0):
+            specRad = abs(np.linalg.eig(internalWeights)[0][0]) ## MB: why abs? then always 0 or greater
+            if (specRad > 0):                                   ## MB: or is this just checking greater than 0?
                 internalWeights = internalWeights / specRad
                 success = True
         except e:
             print(e)
     return internalWeights
 
-
-
-# making waveform patterns
-
+# making some waveform patterns that we might use
 pSaw = lambda n: (round(n % waveLengthSamples) / waveLengthSamples * 2) - 1.0
 pPulse = lambda n: (((n % waveLengthSamples) < (waveLengthSamples * 0.5)) * 2) - 1.0
 pSine2 = lambda n: (sin(n) * sin((n+pi/4)/6))
 pSine3 = lambda n: (sin(n) * sin((n/4)/6)/6)
-
 pJ1 = lambda n: 1 * sin(2 * pi * n / 3.1504531)
 pJ1b = lambda n: 1 * sin(n/2) ** 1
 
@@ -53,17 +49,26 @@ pTri = lambda n,p: (n % p) * floor(n % (2*p))
 
 
 # make a network
-# p is a set of parameters
-def makeNetwork(p):
-    figsize(20,2)
-    signalPlotLength = 15
-   # pattern readout learning
-    patterns = np.array([1,2])
-    
-    Netconnectivity = 1
+# p is a set of parameters, like
+#params = {
+    # 'N':30, # size of RNN
+    # 'NetSR':1.6,
+    # 'NetinpScaling':1.6,
+    # 'BiasScaling':0.3,
+    # 'TychonovAlpha':0.0001,
+    # 'TychonovAlphaReadout':0.0001,
+    # 'washoutLength':100,
+    # 'learnLength':500, 
+    # 'learnLengthWout':500,
+    # 'recallTestLength':100,
+    # 'alphas':np.array([12.0,24.0]),
+    # 'patts':np.array([pJ1b, pJ2])
+#}
+def makeNetwork(p):    
+    NetConnectivity = 1 # just for small networks
     if p['N'] > 20:
-        Netconnectivity = 10.0/p['N'];
-    WstarRaw = generateInternalWeights(p['N'], Netconnectivity)
+        NetConnectivity = 10.0/p['N'];
+    WstarRaw = generateInternalWeights(p['N'], NetConnectivity)
     WinRaw = np.random.randn(p['N'], 1)
     WbiasRaw = np.random.randn(p['N'], 1)
 
@@ -77,7 +82,7 @@ def makeNetwork(p):
     x = np.zeros((p['N'],1))
     
     
-    for n in arange(p['washoutLength'] + p['learnLength']):
+    for n in range(p['washoutLength'] + p['learnLength']):
         u = np.random.randn() * 1.5
         x = np.tanh((Wstar * x) + (Win * u + Wbias))
         if n >= p['washoutLength']:
@@ -103,8 +108,8 @@ def makeNetwork(p):
     SRCollectors =  np.zeros((1, p['patts'].size), dtype=np.object)
     URCollectors =  np.zeros((1, p['patts'].size), dtype=np.object)
     patternRs =  np.zeros((1, p['patts'].size), dtype=np.object)
-    train_xPL =  np.zeros((1, p['patts'].size), dtype=np.object)
-    train_pPL =  np.zeros((1, p['patts'].size), dtype=np.object)
+    #train_xPL =  np.zeros((1, p['patts'].size), dtype=np.object)
+    #train_pPL =  np.zeros((1, p['patts'].size), dtype=np.object)
     startXs =  np.zeros((p['N'], p['patts'].size), dtype=np.object)
 
     for i_pattern in range(p['patts'].size):
@@ -133,8 +138,8 @@ def makeNetwork(p):
         startXs[:,i_pattern] = x[:,0]
         
         #needed?
-        train_xPL[0,i_pattern] = xCollector[:,:signalPlotLength]
-        train_pPL[0,i_pattern] = pCollector[0,:signalPlotLength]
+        #train_xPL[0,i_pattern] = xCollector[:,:signalPlotLength]
+        #train_pPL[0,i_pattern] = pCollector[0,:signalPlotLength]
         ###
         
         allTrainArgs[:, i_pattern * p['learnLength']:(i_pattern+1) * p['learnLength']] = xCollector
