@@ -171,6 +171,19 @@ def makeNetwork(p):
 
     return locals()
 
+def conceptor_mix_step( net, x, morphvalues, oversample=1 ):
+    ind = 0
+    C = np.zeros( (net['p']['N'] , net['p']['N'] ) )
+    for i_morph in morphvalues:
+        C = C + (net['Cs'][0,ind].dot( i_morph ))
+        ind = ind + 1
+    Wsr = net['W'].dot(1.2)
+    for i_oversample in range( oversample ):
+        x = np.tanh(Wsr.dot(x) + net['Wbias'])
+        x = C.dot(x)
+    output = net['Wout'].dot(x)
+    return output, x
+
 ##### OSC server ####
 
 from liblo import *
