@@ -59,13 +59,13 @@ pTri = lambda n,p: (((n % p) >= (p/2)) * ((p/2) - (n % (p/2))) + ((n % p) < (p/2
     # 'TychonovAlpha':0.0001,
     # 'TychonovAlphaReadout':0.0001,
     # 'washoutLength':100,
-    # 'learnLength':500, 
+    # 'learnLength':500,
     # 'learnLengthWout':500,
     # 'recallTestLength':100,
     # 'alphas':np.array([12.0,24.0]),
     # 'patts':np.array([pJ1b, pJ2])
 #}
-def makeNetwork(p):    
+def makeNetwork(p):
     NetConnectivity = 1 # just for small networks
     if p['N'] > 20:
         NetConnectivity = 10.0/p['N'];
@@ -81,7 +81,7 @@ def makeNetwork(p):
     xCollector = np.zeros((p['N'], p['learnLengthWout']))
     pCollector = np.zeros((1, p['learnLengthWout']))
     x = np.zeros((p['N'],1))
-    
+
     for n in np.arange(p['washoutLength'] + p['learnLength']):
         u = np.random.randn() * 1.5
         x = np.tanh((Wstar * x) + (Win * u + Wbias))
@@ -240,6 +240,9 @@ def makeOSCServer(onMorph):
         print(str(err))
 
     server.start()
+
+def freeServer():
+    server.free()
 
 
 
