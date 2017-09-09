@@ -30,25 +30,6 @@ def generateInternalWeights(nInternalUnits, connectivity):
             print(e)
     return internalWeights
 
-# making some waveform patterns that we might use
-pSaw = lambda n: (round(n % waveLengthSamples) / waveLengthSamples * 2) - 1.0
-pPulse = lambda n: (((n % waveLengthSamples) < (waveLengthSamples * 0.5)) * 2) - 1.0
-pSine2 = lambda n: (np.sin(n) * np.sin((n+pi/4)/6))
-pSine3 = lambda n: (np.sin(n) * np.sin((n/4)/6)/6)
-pJ1 = lambda n: 1 * np.sin(2 * pi * n / 3.1504531)
-pJ1b = lambda n: 1 * np.sin(n/2) ** 1
-
-period2 = 2
-rawp = np.random.randn(period2)
-# rawp = np.array([1.1929,2.6856]);
-maxVal = np.max(rawp)
-minVal = np.min(rawp)
-rp = 0.5 * (2 * (rawp - minVal) / (maxVal - minVal) - 1);
-pJ2 = lambda n: rp[np.mod(n, period2 )]
-pTri = lambda n,p: (((n % p) >= (p/2)) * ((p/2) - (n % (p/2))) + ((n % p) < (p/2)) * (n % (p/2))) * (2/p)
-
-
-
 # make a network
 # p is a set of parameters, like
 #params = {
@@ -197,7 +178,7 @@ import sys
 
 
 class MyServer(ServerThread):
-    def __init__(self, onMorph):
+    def __init__(self, onMorph, onExit):
         ServerThread.__init__(self, 57400)
         self.onMorph = onMorph
         print("server created")
@@ -208,38 +189,52 @@ class MyServer(ServerThread):
             print (str(err))
             sys.exit()
 
+    def send_value( self, tag, value ):
+        send( self.target, tag, value )
+    
+    def send_array( self, tag, vals ):
+        # we can also build a message object first...
+        msg = Message( tag )
+        # ... append arguments later...
+        for v in vals:
+            msg.add(v)
+        # ... and then send it
+        send(self.target, msg)
 
-    @make_method('/morph', 'f')
+    @make_method('/morph', 'if')
     def morph_callback(self, path, args):
-        f = args[0]
+        ind = args[0]
+        f = args[1]
 #        print("received message ",path," with arguments: ", f)
-        value = self.onMorph(f)
-        send(self.target, "/output", value)
+        value = self.onMorph(ind,f)
+        #send(self.target, "/output", value)
 
-    @make_method('/test', None)
-    def test_callback(self, path, args):
+    @make_method('/exit', None)
+    def exit_callback(self, path, args):
 #        print("received message ",path," with arguments: ", f)
-        print("test")
+        print("exit")
+        value = self.onExit()
+        send(self.target, "/exited" )
 
     @make_method(None, None)
     def fallback(self, path, args):
-        print("received unknown message ", path)
+        print("received unknown message ", path, args)
 
 
-def makeOSCServer(onMorph):
-    global server
+def makeOSCServer(onMorph,onExit):
     try:
         server.free()
     except:
         pass
 
     try:
-        server = MyServer(onMorph)
+        server = MyServer(onMorph,onExit)
         print("server running")
     except err:
         print(str(err))
 
     server.start()
+    return server
 
 def freeServer():
     server.free()
