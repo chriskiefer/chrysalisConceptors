@@ -58,14 +58,16 @@ def makeNetwork(p):
     Wstar = p['NetSR'] * WstarRaw;
     Win = p['NetinpScaling'] * WinRaw;
     Wbias = p['BiasScaling'] * WbiasRaw;
-    I = np.eye(p['N'])
-    xCollector = np.zeros((p['N'], p['learnLengthWout']))
-    pCollector = np.zeros((1, p['learnLengthWout']))
-    x = np.zeros((p['N'],1))
+    I = np.eye(p['N']) # identity matrix
 
-    for n in np.arange(p['washoutLength'] + p['learnLengthWout']):
-        u = np.random.randn() * 1.5
-        x = np.tanh((Wstar * x) + (Win * u + Wbias))
+    xCollector = np.zeros((p['N'], p['learnLengthWout'])) # variable to collect states of x
+    pCollector = np.zeros((1, p['learnLengthWout'])) # variable to collect states of p (output?)
+    x = np.zeros((p['N'],1)) # initial state
+
+    # first training: washout is to wash out the input state 'noise'; learnLength is then the actual amount of learning samples
+    for n in np.arange(p['washoutLength'] + p['learnLength']):
+        u = np.random.randn() * 1.5  # random input
+        x = np.tanh((Wstar * x) + (Win * u + Wbias)) # calculate next internal activation
         if n >= p['washoutLength']:
             xCollector[:, n - p['washoutLength']] = x[:,0]
             pCollector[0, n - p['washoutLength']] = u
@@ -75,8 +77,8 @@ def makeNetwork(p):
 #     plot(np.max(xCollector.T, axis=1))
 #     plot(np.min(xCollector.T, axis=1))
 
-    Wout = np.linalg.inv(xCollector.dot(xCollector.conj().T) +
-                  (p['TychonovAlphaReadout'] * np.eye(p['N']))).dot(xCollector).dot(pCollector.conj().transpose()).conj().T
+    # Wout
+    Wout = np.linalg.inv( xCollector.dot(xCollector.conj().T) + ( p['TychonovAlphaReadout'] * np.eye(p['N']) ) ).dot(xCollector).dot(pCollector.conj().transpose()).conj().T
     print("Initial training")
     print("NRMSE: ", nrmse(Wout.dot(xCollector), pCollector))
     print("absWeight: ", np.mean(abs(Wout)))
@@ -170,6 +172,19 @@ def makeNetwork(p):
     #     plot([p['patts'][i_pattern](x) for x in arange(p['recallTestLength'])])
 
     return locals()
+
+def conceptor_mix_step( net, x, morphvalues, oversample=1 ):
+    ind = 0
+    C = np.zeros( (net['p']['N'] , net['p']['N'] ) )
+    for i_morph in morphvalues:
+        C = C + (net['Cs'][0,ind].dot( i_morph ))
+        ind = ind + 1
+    Wsr = net['W'].dot(1.2)
+    for i_oversample in range( oversample ):
+        x = np.tanh(Wsr.dot(x) + net['Wbias'])
+        x = C.dot(x)
+    output = net['Wout'].dot(x)
+    return output, x
 
 ##### OSC server ####
 

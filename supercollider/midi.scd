@@ -1,5 +1,4 @@
 MIDIIn.connectAll;
-
 MIDIFunc.trace( false )
 
 // S1 - S9:
@@ -19,58 +18,74 @@ MIDIdef.cc( \S9, { |v,ctl| [ v, ctl ].postln }, 7, 0 );
 
 
 
+(
 n = NetAddr.new( "127.0.0.1", 57400 );
 
 ~morphMap = [-1,2,\linear].asSpec;
-~morphMap = [0,2,\linear].asSpec;
+~morphMap = [0,1,\linear].asSpec;
 
-~outRateMap = [0.025,0.3,\linear].asSpec;
-
-~morphMap.map(0)
+~outRateMap = [0.01,0.3,\linear].asSpec;
+);
+//~morphMap.map(0)
 
 // interactions
 (
 MIDIdef.cc( \S7, { |v,ctl|
 	~morphFactor = ~morphMap.map( v / 127.0 );
 	n.sendMsg( "/morph", 0, ~morphFactor );
+	n.sendMsg( "/morph", 3, ~morphFactor );
+	n.sendMsg( "/morph", 6, ~morphFactor );
 }, 94, 0 );
 MIDIdef.cc( \S8, { |v,ctl|
 	~morphFactor = ~morphMap.map( v / 127.0 );
 	n.sendMsg( "/morph", 1, ~morphFactor );
+	n.sendMsg( "/morph", 4, ~morphFactor );
+	n.sendMsg( "/morph", 7, ~morphFactor );
 }, 95, 0 );
 MIDIdef.cc( \S9, { |v,ctl|
 	~morphFactor = ~morphMap.map( v / 127.0 );
 	n.sendMsg( "/morph", 2, ~morphFactor );
+	n.sendMsg( "/morph", 5, ~morphFactor );
+	n.sendMsg( "/morph", 8, ~morphFactor );
 }, 7, 0 );
 
-OSCdef( \output, { |msg|
-	var val = msg[1] * 0.5 + 0.5;
+~outputMap = [-2,2].asSpec;
+OSCdef( \output1, { |msg|
+	var val = ~outputMap.unmap( msg[1] );
+	~outputValue1 = val;
+	Ndef( \wavetable ).set( \rate, ~outRateMap.map( ~outputValue1 ) );
+}, "/output/1" );
+
+OSCdef( \output2, { |msg|
+	var val = ~outputMap.unmap( msg[1] );
 	// val.postln;
-	~outputValue = val;
-	Ndef( \wavetable ).set( \rate, ~outRateMap.map( ~outputValue ) );
-	~microWashes.do{ |it| it.rgbw_( (msg[1] - 1 * 255).round(1).asInteger, 0, 0, 0 ) };
-	~setAllLights.value;
-}, "/output" );
+	~outputValue2 = val;
+	Ndef( \wavetable2 ).set( \rate, ~outRateMap.map( ~outputValue2 ) );
+}, "/output/2" );
+
+OSCdef( \output3, { |msg|
+	var val = ~outputMap.unmap( msg[1] );
+	// val.postln;
+	~outputValue3 = val;
+	Ndef( \wavetable3 ).set( \rate, ~outRateMap.map( ~outputValue3 ) );
+}, "/output/3" );
 
 );
-
-Tdef( \updateMorph ).stop;
-
-~microWashes.do{ |it| it.rgbw_( 0, 0, 0, 0 ) }; ~setAllLights.value;
-
-~monitor = SWPlotterMonitor( { ~outputValue }, 500 );
-~monitor.start;
 
 (
-OSCdef( \x, { |msg|
-	var val = msg.copyToEnd(1);
-	// val.postln;
-	~xvals = val;
-	b.setn( 0, ~xvals );
-}, "/x" );
-);
+~dmxMap = [0,255,\linear,1].asSpec;
+Tdef( \updateLight, {
+	loop {
+		~microWashes.do{ |it| it.rgb_(
+			~dmxMap.map( ~outputValue1 ),
+			~dmxMap.map( ~outputValue2 ),
+			~dmxMap.map( ~outputValue3 ),
+			0
+		)};
+		~setAllLights.value;
+		0.05.wait;
+	}
+}).play;
+)
 
-~xvals.size
-
-~monitorx = SWPlotterMonitor( { ~xvals }, 500, 30 );
-~monitorx.start;
+// OSCdef( \x ).remove
