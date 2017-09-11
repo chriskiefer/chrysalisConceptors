@@ -63,7 +63,7 @@ def makeNetwork(p):
     pCollector = np.zeros((1, p['learnLengthWout']))
     x = np.zeros((p['N'],1))
 
-    for n in np.arange(p['washoutLength'] + p['learnLength']):
+    for n in np.arange(p['washoutLength'] + p['learnLengthWout']):
         u = np.random.randn() * 1.5
         x = np.tanh((Wstar * x) + (Win * u + Wbias))
         if n >= p['washoutLength']:
@@ -191,7 +191,7 @@ class MyServer(ServerThread):
 
     def send_value( self, tag, value ):
         send( self.target, tag, value )
-    
+
     def send_array( self, tag, vals ):
         # we can also build a message object first...
         msg = Message( tag )
