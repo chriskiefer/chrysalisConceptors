@@ -1,72 +1,26 @@
 <xml>
   <hive name="stretch">
 
-   <minibee caps="1" configuration="2" id="1" libversion="7" name="stretchtest" revision="D" serial="0013A20040C18217">
+   <minibee caps="1" configuration="6" id="1" libversion="7" name="stretchtest" revision="D" serial="0013A20040C18217">
     </minibee>
 
-   <minibee caps="1" configuration="2" id="2" libversion="7" name="stretchtest2" revision="D" serial="0013A20040A16A84">
+   <minibee caps="1" configuration="6" id="2" libversion="7" name="stretchtest2" revision="D" serial="0013A20040A16A84">
     </minibee>
 
-   <minibee caps="1" configuration="2" id="3" libversion="7" name="stretchtest3" revision="D" serial="0013A20040C1816C">
+   <minibee caps="1" configuration="6" id="3" libversion="7" name="stretchtest3" revision="D" serial="0013A20040C1816C">
     </minibee>
 
-   <minibee caps="1" configuration="5" id="4" libversion="8" name="vibro" revision="D" serial="0013A20040C18150">
+   <minibee caps="1" configuration="6" id="4" libversion="8" name="vibro" revision="D" serial="0013A20040C18150">
     </minibee>
 
-   <minibee caps="1" configuration="4" id="5" libversion="8" name="wezenctl" revision="D" serial="0013A20040A16A57">
+   <minibee caps="1" configuration="6" id="5" libversion="8" name="wezenctl" revision="D" serial="0013A20040A16A57">
     </minibee>
 
-
-    <configuration id="1" message_interval="15" name="stretch" redundancy="3" samples_per_message="1">
-    <pin config="AnalogIn10bit" id="A0"  name="analog2" />
-    <pin config="AnalogIn10bit" id="A1"  name="analog4" />
-    <pin config="AnalogIn10bit" id="A2"  name="analog2" />
-    <pin config="AnalogIn10bit" id="A3"  name="analog4" />
-    <pin config="AnalogIn10bit" id="A6"  name="analog2" />
-    <pin config="AnalogIn10bit" id="A7"  name="analog4" />
-    <pin config="TWIData" id="A4" />
-    <pin config="TWIClock" id="A5" />
-    <twi id="1" device="ADXL345" name="accelero" />
-  </configuration>
-
-
-    <configuration id="2" message_interval="15" name="stretch2" redundancy="3" samples_per_message="1">
-    <pin config="AnalogIn10bit" id="A2"  name="analog2" />
-    <pin config="AnalogIn10bit" id="A6"  name="analog6" />
-    <pin config="TWIData" id="A4" />
-    <pin config="TWIClock" id="A5" />
-    <twi id="1" device="ADXL345" name="accelero" />
-  </configuration>
-
-  <configuration id="3" message_interval="30" name="vibro" redundancy="3" samples_per_message="1">
-    <pin config="AnalogOut" id="D3"  name="vibro1" />
-    <pin config="AnalogOut" id="D5"  name="vibro2" />
-    <pin config="TWIData" id="A4" />
-    <pin config="TWIClock" id="A5" />
-    <twi id="1" device="ADXL345" name="accelero" />
-  </configuration>
-
-    <configuration id="4" message_interval="15" name="accelero5button" redundancy="3" rssi="True" samples_per_message="1">
+    <configuration id="6" message_interval="15" name="justacceleration" redundancy="3" rssi="True" samples_per_message="1">
 	    <pin config="TWIData" id="A4" />
     	<pin config="TWIClock" id="A5" />
     	<twi id="1" device="ADXL345" name="accelero" />
-      <pin config="DigitalIn" id="D8" name="digitaal4"/>
-      <pin config="DigitalIn" id="D6" name="digitaal2"/>
-      <pin config="DigitalIn" id="D7" name="digitaal3"/>
-      <pin config="DigitalIn" id="D5" name="digitaal1"/>
-      <pin config="DigitalIn" id="D3" name="digitaal0"/>
     </configuration>
-
-  <configuration id="5" message_interval="20" name="vibrocue" redundancy="3" samples_per_message="1">
-	<customconf>
-	    <data id="0" name="vibrating" offset="0" scale="1" size="1"/>
-        <data id="1" name="intensity1" offset="0" scale="1" size="1"/>
-        <data id="2" name="intensity2" offset="0" scale="1" size="1"/>
-        <data id="3" name="pattern" offset="0" scale="1" size="1"/>
-        <data id="4" name="duration" offset="0" scale="1" size="1"/>
-        <data id="5" name="pIndex" offset="0" scale="1" size="1"/>
-	</customconf>
-  </configuration>
 
   </hive>
 </xml>

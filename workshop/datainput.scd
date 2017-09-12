@@ -14,7 +14,7 @@ OSCdef( \minibeedata, { |data,time,src|  data.postln; }, '/minibee/data' );
 x = SWDataNetwork.new;
 x.addExpected( 1, \acceleration, 3 ); // create a node with ID=1, name=\acceleration and 3 data streams
 
-OSCdef( \minibeedata, { |data,time,src| x.setData(1, data.copyToEnd(7) ); }, '/minibee/data' ); // redirect the incoming OSC data to the node we made.
+OSCdef( \minibeedata, { |data,time,src| x.setData(1, data.copyToEnd(2) ); }, '/minibee/data' ); // redirect the incoming OSC data to the node we made.
 
 x.makeNodeGui; // makes a GUI of the datanetwork.
 // click on the button [ > ] to see the individual datastreams - click on [ Mon ] to have a realtime plot
@@ -97,9 +97,3 @@ Tdef( \recordGesture, {
 
 // NOW we go to the jupyter notebook to look at the data there and see whether our algorithm can distinguish the two gestures!
 
-
-// realtime recognition
-
-// and now we assign an action to send the data in realtime to the python script:
-n = NetAddr.new( "127.0.0.1", 57400 );
-x.nodes[21].action = { |data| n.sendMsg( "/input", data[0] ); };

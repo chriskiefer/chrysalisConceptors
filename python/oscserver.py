@@ -8,13 +8,12 @@ import sys
 
 
 class MyServer(ServerThread):
-    def __init__(self, onMorph, onExit):
+    def __init__(self, targetPort, onExit):
         ServerThread.__init__(self, 57400)
-        self.onMorph = onMorph
         print("server created")
-
+        self.onExit = onExit
         try:
-            self.target = Address(57120)
+            self.target = Address(targetPort)
         except AddressError as err:
             print (str(err))
             sys.exit()
@@ -32,7 +31,7 @@ class MyServer(ServerThread):
         send(self.target, msg)
 
     @make_method('/conceptor/store', 'i')
-    def input_callback(self, path, args):
+    def conceptor_callback(self, path, args):
         ind = args[0]
 #        print("received message ",path," with arguments: ", f)
         value = self.onConceptorStore(ind)
@@ -42,12 +41,12 @@ class MyServer(ServerThread):
     def input_callback(self, path, args):
         ind = args[0]
         f = args[1]
-#        print("received message ",path," with arguments: ", f)
+        #print("received input message ",path," with arguments: ", ind, f)
         value = self.onInput(ind,f)
         #send(self.target, "/output", value)
 
     @make_method('/spectralradius', 'if')
-    def input_callback(self, path, args):
+    def spectral_callback(self, path, args):
         ind = args[0]
         f = args[1]
 #        print("received message ",path," with arguments: ", f)
@@ -74,21 +73,15 @@ class MyServer(ServerThread):
         print("received unknown message ", path, args)
 
 
-def makeOSCServer(onMorph,onExit):
+def makeOSCServer(targetPort,onExit):
     try:
         server.free()
     except:
         pass
 
     try:
-        server = MyServer(onMorph,onExit)
-        print("server running")
+        server = MyServer(targetPort,onExit)
     except err:
         print(str(err))
 
-    server.start()
     return server
-
-def freeServer():
-    server.free()
-

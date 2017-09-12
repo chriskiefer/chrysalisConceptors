@@ -5,7 +5,8 @@ import numpy as np
 #from numpy import linalg
 import scipy as sp
 import dill as pickle
-import numba
+
+from numba import jit
 
 # normalized root mean square between two time series
 # output: actual output of network
@@ -40,8 +41,9 @@ def loadClassifierNetwork(filename):
 def createState(net):
     return {'x':np.zeros((net['p']['N'],1)),
            'xOld':np.zeros((net['p']['N'],1)),
-           'evidence':np.zeros(2)}
+           'evidence':np.zeros(4)}
 
+@jit
 def iterateClassifier(net, state, u):
     state['xOld'] = state['x']
     Wtarget = (net['net']['W'].dot(state['x'])) + (net['net']['Win'].dot(u))
@@ -50,9 +52,13 @@ def iterateClassifier(net, state, u):
     C2 = net['Cs'][0,1]
     x = state['x']
 
-    state['evidence'][0] = x.T.dot(C.dot(x)) + x.T.dot((1.0-C2).dot(x)) #is p1, not p2
-    state['evidence'][1] = x.T.dot(C2.dot(x)) + x.T.dot((1.0-C).dot(x)) #is p2, no1 p1
-    state['evidence'][2] = x.T.dot((1.0 - C2).dot(x)) + x.T.dot((1.0-C).dot(x)) #not p1 + not p2
+    #state['evidence'][0] = x.T.dot(C.dot(x)) + x.T.dot((1.0-C2).dot(x)) #is p1, not p2
+    #state['evidence'][1] = x.T.dot(C2.dot(x)) + x.T.dot((1.0-C).dot(x)) #is p2, no1 p1
+    #state['evidence'][2] = x.T.dot((1.0 - C2).dot(x)) + x.T.dot((1.0-C).dot(x)) #not p1 + not p2
+    state['evidence'][0] = x.T.dot(C.dot(x)) #is p1
+    state['evidence'][1] = x.T.dot(C2.dot(x)) #is p2
+    state['evidence'][2] = x.T.dot((1.0-C).dot(x)) #not p1
+    state['evidence'][3] = x.T.dot((1.0 - C2).dot(x)) #n not p2
     return state
 
 # state = createState(restored)
