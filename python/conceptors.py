@@ -36,9 +36,26 @@ def loadClassifierNetwork(filename):
         restored = pickle.load(input_file)
     return restored
 
+def createState(net):
+    return {'x':np.zeros((net['p']['N'],1)),
+           'xOld':np.zeros((net['p']['N'],1)),
+           'evidence':np.zeros(2)}
 
+def iterateClassifier(net, state, u):
+    state['xOld'] = state['x']
+    Wtarget = (net['net']['W'].dot(state['x'])) + (net['net']['Win'].dot(u))
+    state['x'] = ((1.0-net['p']['LR']) * state['xOld']) + (net['p']['LR'] * tanh(Wtarget + net['net']['Wbias']))
+    C = net['Cs'][0,0]
+    C2 = net['Cs'][0,1]
+    x = state['x']
 
+    state['evidence'][0] = x.T.dot(C.dot(x)) + x.T.dot((1.0-C2).dot(x))
+    state['evidence'][1] = x.T.dot(C2.dot(x)) + x.T.dot((1.0-C).dot(x))
+    return state
 
+# state = createState(restored)
+# state = iterateClassifier(restored, state, 0.4)
+# state['evidence']
 
 
 # make a network
