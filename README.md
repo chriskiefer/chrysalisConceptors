@@ -59,3 +59,7 @@ jupyter-notebook
 ```
 deactivate
 ```
+
+# pyosc
+
+PyOSC is in this repository in an attempt to port it to Python3. This port is not quite complete yet, and we resorted to using pyliblo instead.
