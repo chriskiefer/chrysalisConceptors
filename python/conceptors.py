@@ -5,6 +5,7 @@ import numpy as np
 #from numpy import linalg
 import scipy as sp
 import dill as pickle
+import numba
 
 # normalized root mean square between two time series
 # output: actual output of network
@@ -44,7 +45,7 @@ def createState(net):
 def iterateClassifier(net, state, u):
     state['xOld'] = state['x']
     Wtarget = (net['net']['W'].dot(state['x'])) + (net['net']['Win'].dot(u))
-    state['x'] = ((1.0-net['p']['LR']) * state['xOld']) + (net['p']['LR'] * tanh(Wtarget + net['net']['Wbias']))
+    state['x'] = ((1.0-net['p']['LR']) * state['xOld']) + (net['p']['LR'] * np.tanh(Wtarget + net['net']['Wbias']))
     C = net['Cs'][0,0]
     C2 = net['Cs'][0,1]
     x = state['x']
