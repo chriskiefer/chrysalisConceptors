@@ -32,6 +32,11 @@ def generateInternalWeights(nInternalUnits, connectivity):
     return internalWeights
 
 def loadClassifierNetwork(filename):
+    with open(filename, "rb") as input_file:
+        restored = pickle.load(input_file)
+    return restored
+
+
 
 
 
