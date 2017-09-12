@@ -50,8 +50,9 @@ def iterateClassifier(net, state, u):
     C2 = net['Cs'][0,1]
     x = state['x']
 
-    state['evidence'][0] = x.T.dot(C.dot(x)) + x.T.dot((1.0-C2).dot(x))
-    state['evidence'][1] = x.T.dot(C2.dot(x)) + x.T.dot((1.0-C).dot(x))
+    state['evidence'][0] = x.T.dot(C.dot(x)) + x.T.dot((1.0-C2).dot(x)) #is p1, not p2
+    state['evidence'][1] = x.T.dot(C2.dot(x)) + x.T.dot((1.0-C).dot(x)) #is p2, no1 p1
+    state['evidence'][2] = x.T.dot((1.0 - C2).dot(x)) + x.T.dot((1.0-C).dot(x)) #not p1 + not p2
     return state
 
 # state = createState(restored)
