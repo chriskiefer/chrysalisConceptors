@@ -216,6 +216,29 @@ class MyServer(ServerThread):
         # ... and then send it
         send(self.target, msg)
 
+    @make_method('/conceptor/store', 'i')
+    def input_callback(self, path, args):
+        ind = args[0]
+#        print("received message ",path," with arguments: ", f)
+        value = self.onConceptorStore(ind)
+        #send(self.target, "/output", value)
+        
+    @make_method('/input', 'if')
+    def input_callback(self, path, args):
+        ind = args[0]
+        f = args[1]
+#        print("received message ",path," with arguments: ", f)
+        value = self.onInput(ind,f)
+        #send(self.target, "/output", value)
+
+    @make_method('/spectralradius', 'if')
+    def input_callback(self, path, args):
+        ind = args[0]
+        f = args[1]
+#        print("received message ",path," with arguments: ", f)
+        value = self.onSpectral(ind,f)
+        #send(self.target, "/output", value)
+
     @make_method('/morph', 'if')
     def morph_callback(self, path, args):
         ind = args[0]
