@@ -40,13 +40,13 @@ def generateInternalWeights(nInternalUnits, connectivity):
     # 'TychonovAlpha':0.0001,
     # 'TychonovAlphaReadout':0.0001,
     # 'washoutLength':100,
-    # 'learnLength':500, 
+    # 'learnLength':500,
     # 'learnLengthWout':500,
     # 'recallTestLength':100,
     # 'alphas':np.array([12.0,24.0]),
     # 'patts':np.array([pJ1b, pJ2])
 #}
-def makeNetwork(p):    
+def makeNetwork(p):
     NetConnectivity = 1 # just for small networks
     if p['N'] > 20:
         NetConnectivity = 10.0/p['N'];
@@ -59,11 +59,11 @@ def makeNetwork(p):
     Win = p['NetinpScaling'] * WinRaw;
     Wbias = p['BiasScaling'] * WbiasRaw;
     I = np.eye(p['N']) # identity matrix
-    
+
     xCollector = np.zeros((p['N'], p['learnLengthWout'])) # variable to collect states of x
     pCollector = np.zeros((1, p['learnLengthWout'])) # variable to collect states of p (output?)
     x = np.zeros((p['N'],1)) # initial state
-    
+
     # first training: washout is to wash out the input state 'noise'; learnLength is then the actual amount of learning samples
     for n in np.arange(p['washoutLength'] + p['learnLength']):
         u = np.random.randn() * 1.5  # random input
@@ -77,7 +77,7 @@ def makeNetwork(p):
 #     plot(np.max(xCollector.T, axis=1))
 #     plot(np.min(xCollector.T, axis=1))
 
-    # Wout 
+    # Wout
     Wout = np.linalg.inv( xCollector.dot(xCollector.conj().T) + ( p['TychonovAlphaReadout'] * np.eye(p['N']) ) ).dot(xCollector).dot(pCollector.conj().transpose()).conj().T
     print("Initial training")
     print("NRMSE: ", nrmse(Wout.dot(xCollector), pCollector))
@@ -206,7 +206,7 @@ class MyServer(ServerThread):
 
     def send_value( self, tag, value ):
         send( self.target, tag, value )
-    
+
     def send_array( self, tag, vals ):
         # we can also build a message object first...
         msg = Message( tag )
@@ -273,6 +273,9 @@ def makeOSCServer(onMorph,onExit):
 
     server.start()
     return server
+
+def freeServer():
+    server.free()
 
 
 
