@@ -85,7 +85,7 @@ def iterateGenerator(net, state, mixArray, excitation):
     #update reservoir
     state['xOld'] = state['x']
     Wtarget = Wsr.dot(state['x'])
-    state['x'] = ((1.0-net['p']['LR']) * state['xOld']) + (net['p']['LR'] * tanh(Wtarget + net['net']['Wbias']))
+    state['x'] = ((1.0-net['p']['LR']) * state['xOld']) + (net['p']['LR'] * np.tanh(Wtarget + net['net']['Wbias']))
     #apply mixed conceptor
     state['x'] = C.dot(state['x'])
     #compute output layer
