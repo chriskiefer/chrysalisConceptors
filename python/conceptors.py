@@ -92,9 +92,15 @@ def iterateGenerator(net, state, mixArray, excitation):
     state['output'] = net['net']['Wout'].dot(np.concatenate((state['x'][:,0], np.array([1]))))
     return state
 
+def randomiseNetworkState(net, state):
+    state['x'] = np.random.rand(net['p']['N'],1)
+    return state
+
 # state = createGeneratorState(cnet2)
 # state = iterateGenerator(cnet2, state, np.array([0.0, 1.0]), 1.0)
 # state['output']
+
+# state = randomiseNetworkState(net, state)
 
 # state = createState(restored)
 # state = iterateClassifier(restored, state, 0.4)
