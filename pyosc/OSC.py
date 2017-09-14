@@ -169,7 +169,7 @@ global FloatTypes
 FloatTypes = [float] #[types.FloatType]
 
 global IntTypes
-IntTypes = [int] #[types.IntType]
+IntTypes = [int] #[int]
 
 global NTP_epoch
 from calendar import timegm
@@ -354,7 +354,7 @@ class OSCMessage(object):
 		out = list(values)
 		out.extend(self.values())
 		
-		if type(values) == types.TupleType:
+		if type(values) == tuple: # tuple:
 			return tuple(out)
 		
 		return out
@@ -409,14 +409,14 @@ class OSCMessage(object):
 	def _buildItemList(self, values, typehint=None):
 		if isinstance(values, OSCMessage):
 			items = values.items()
-		elif type(values) == types.ListType:
+		elif type(values) == list: #types.ListType:
 			items = []
 			for val in values:
-				if type(val) == types.TupleType:
+				if type(val) == tuple:  #tuple:
 					items.append(val[:2])
 				else:
 					items.append((typehint, val))
-		elif type(values) == types.TupleType:
+		elif type(values) == tuple:  #tuple:
 			items = [values[:2]]
 		else:		
 			items = [(typehint, values)]
@@ -432,7 +432,7 @@ class OSCMessage(object):
 		
 		new_items = self._buildItemList(val)
 		
-		if type(i) != types.SliceType:
+		if type(i) != slice: # types.SliceType:
 			if len(new_items) != 1:
 				raise TypeError("single-item assignment expects a single value or a (typetag, value) tuple")
 			
@@ -631,7 +631,7 @@ class OSCBundle(OSCMessage):
 			binary = OSCBlob(argument.getBinary())
 		else:
 			msg = OSCMessage(self.address)
-			if type(argument) == types.DictType:
+			if type(argument) == dict:  #types.DictType:
 				if 'addr' in argument:
 					msg.setAddress(argument['addr'])
 				if 'args' in argument:
@@ -789,7 +789,7 @@ def OSCTimeTag(time):
 def _readString(data):
 	"""Reads the next (null-terminated) block of data
 	"""
-	length   = string.find(data,"\0")
+	length   = str.find(data,"\0")
 	nextData = int(math.ceil((length+1) / 4.0) * 4)
 	return (data[0:length], data[nextData:])
 
@@ -937,7 +937,7 @@ def getUrlStr(*args):
 	if not len(args):
 		return ""
 		
-	if type(args[0]) == types.TupleType:
+	if type(args[0]) == tuple:  #tuple:
 		host = args[0][0]
 		port = args[0][1]
 		args = args[1:]
@@ -959,7 +959,7 @@ def getUrlStr(*args):
 	else:
 		host = 'localhost'
 	
-	if type(port) == types.IntType:
+	if type(port) == int:
 		return "%s:%d%s" % (host, port, prefix)
 	else:
 		return host + prefix
@@ -1378,7 +1378,7 @@ class OSCMultiClient(OSCClient):
 		if type(address) in types.StringTypes:
 			address = self._searchHostAddr(address)
 				
-		elif (type(address) == types.TupleType):
+		elif (type(address) == tuple):  #tuple):
 			(host, port) = address[:2]
 			try:
 				host = socket.gethostbyname(host)
@@ -1420,7 +1420,7 @@ class OSCMultiClient(OSCClient):
 		if type(address) in types.StringTypes:
 			address = self._searchHostAddr(address) 
 
-		if type(address) == types.TupleType:
+		if type(address) == tuple:
 			(host, port) = address[:2]
 			try:
 				host = socket.gethostbyname(host)
@@ -1438,7 +1438,7 @@ class OSCMultiClient(OSCClient):
 		if type(address) in types.StringTypes:
 			address = self._searchHostAddr(address) 
 
-		if type(address) == types.TupleType:
+		if type(address) == tuple:
 			(host, port) = address[:2]
 			try:
 				host = socket.gethostbyname(host)
@@ -1476,7 +1476,7 @@ class OSCMultiClient(OSCClient):
 		if type(address) in types.StringTypes:
 			address = self._searchHostAddr(address) 
 
-		if (type(address) == types.TupleType): 
+		if (type(address) == tuple): 
 			(host, port) = address[:2]
 			try:
 				host = socket.gethostbyname(host)
@@ -2187,7 +2187,7 @@ class OSCServer(UDPServer, OSCAddressSpace):
 		url = ""
 		have_port = False
 		for item in data:
-			if (type(item) == types.IntType) and not have_port:
+			if (type(item) == int) and not have_port:
 				url += ":%d" % item
 				have_port = True
 			elif type(item) in types.StringTypes:
@@ -2225,7 +2225,7 @@ class OSCServer(UDPServer, OSCAddressSpace):
 		url = ""
 		have_port = False
 		for item in data:
-			if (type(item) == types.IntType) and not have_port:
+			if (type(item) == int) and not have_port:
 				url += ":%d" % item
 				have_port = True
 			elif type(item) in types.StringTypes:
