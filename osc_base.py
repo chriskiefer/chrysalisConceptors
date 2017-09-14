@@ -34,6 +34,7 @@ def sendOSCMessage( path, args ):
 
 def handler_led( path, types, args, source ):        
     print( "Sensor input:", args, len(args) )
+    sendOSCMessage( "/pong", args )
     #call function; args is an array with the values that are sent
       
 ####################### main ################
@@ -46,12 +47,12 @@ receive_address = ( myip, myport )
 osc = OSC.OSCServer( receive_address )
 
 # add handlers
-osc.addMsgHandler( "/sensenode/address", handler_led )  
+osc.addMsgHandler( "/ping", handler_led )  
 
-thread = threading.Thread( target = osc.serve_forever )
-thread.start()
+#thread = threading.Thread( target = osc.serve_forever )
+#thread.start()
     
-stopOSC = false
+stopOSC = False
 while True and not stopOSC:
   osc.handle_request()
   time.sleep(0.001)
