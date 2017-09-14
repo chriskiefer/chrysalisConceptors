@@ -1,8 +1,18 @@
-s.options.numOutputBusChannels_(8);
+s.options.numOutputBusChannels_(10);
 s.boot;
+
+(
+Ndef( \testSound, {
+	PanAz.ar( 8,
+		SinOsc.ar( 300*[1,0.8,0.7,2], 0, 0.1/4 ).sum*EnvGen.kr(Env.perc,Impulse.kr(1)),
+		\pos.kr(0) + \posOffset.kr(1.5)
+	);
+} ).play(0)
+);
 /*
-Ndef( \testSound, { SinOsc.ar( 300*[1,2,3.5,7], 0, 0.1/4 ).sum*EnvGen.kr(Env.perc,Impulse.kr(1)) } ).play(0)
-Ndef( \testSound, { SinOsc.ar( 300, 0, 0.1 )*EnvGen.kr(Env.perc,Impulse.kr(1)) } ).play(0)
+Ndef( \testSound, { SinOsc.ar( 50*[1,0.8,0.7,2], 0, 0.5/4 ).sum*EnvGen.kr(Env.perc,Impulse.kr( LFNoise0.kr(0.1).range(0.8,1.2) ) ).dup(2) } ).play(8)
+Ndef( \testSound, { SinOsc.ar( 300*[1,0.8,0.7,2], 0, 0.1/4 )*EnvGen.kr(Env.perc,Impulse.kr(1)) } ).play(2)
+
 
 Ndef( \testSound, { WhiteNoise.ar( 0.2 ) } ).play(1)
 Ndef( \testSound, { WhiteNoise.ar( 0.2 ) } ).play(2)
@@ -93,11 +103,13 @@ OSCdef( \x1wt ).free
 Signal.with( *~xvals );
 ~b3.free;
 ~b3.plot;
-~b3 = Buffer.alloc( s, 32*2, 1 );
+
+~b3 = Buffer.alloc( s, 64*2, 1 );
 (
 OSCdef( \x1wt, { |msg|
 	var val = msg.copyToEnd(1);
 	var signal = Signal.with( *val );
+	signal = signal.zeroPad(64);
 	// signal.size.postln;
 	~b3.setn( 0, signal.asWavetable );
 }, "/x/1" );
@@ -105,15 +117,19 @@ OSCdef( \x1wt, { |msg|
 (
 Ndef( \wavetableOSC, {
 	Splay.ar(
-		Osc.ar( \bufnum.kr(0), \freq.kr(1,0.5) )
+		RLPF.ar(
+			Osc.ar( \bufnum.kr(0), \freq.kr(1,0.5) ),
+			\ffreq.kr(1000) * [1,5/4,4/5],
+			\rq.kr(0.2), 0.1
+		)
 	);
 	// BufRd.ar( 1, \bufnum.kr(0), LFSaw.ar( \freq.kr(200) ).unipolar.poll(11) );
 });
 );
 
 Ndef( \wavetableOSC ).set( \bufnum, ~b3.bufnum );
+Ndef( \wavetableOSC ).set( \freq, 40, \ffreq, 500 );
 
-Ndef( \wavetableOSC ).set( \freq, 50 );
 
 (
 ~freqMap = [20, 1000, \exponential ].asSpec;

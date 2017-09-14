@@ -19,9 +19,6 @@ MIDIdef.cc( \S9, { |v,ctl| [ v, ctl ].postln }, 7, 0 );
 
 
 (
-n = NetAddr.new( "127.0.0.1", 57400 );
-
-~morphMap = [-1,2,\linear].asSpec;
 ~morphMap = [0,1,\linear].asSpec;
 
 ~outRateMap = [0.01,0.3,\linear].asSpec;
