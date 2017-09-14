@@ -1,0 +1,1 @@
+~jupyter.sendMsg( "/spectralradius", 0, 1.0 );
