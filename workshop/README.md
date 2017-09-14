@@ -27,6 +27,7 @@ At the end of this we save the network for later use.
 
 `realtime_recognition.scd`
 `detectgesture_realtime.ipynb`
+`visualise_detection.scd`
 
-In SuperCollider we now send the data to python. In python we load the network and listen for the incoming data and do a realtime estimation of which gesture it is. The output is received back in SuperCollider, where we do a realtime plot of the data.
+In SuperCollider we now send the data to python. In python we load the network and listen for the incoming data and do a realtime estimation of which gesture it is. The output is received back in SuperCollider, where we do a realtime plot of the data. Then we also create a simple visualisation of the detection which give a more clear indication of how this works.
 
