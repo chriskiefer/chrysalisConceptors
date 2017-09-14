@@ -74,9 +74,10 @@ def createGeneratorState(net):
         'output':0.0
     }
 
-def iterateGenerator(net, state, mixArray, excitation):
+def iterateGenerator(net, state, mixArray, excitation, leakrate):
     #conceptor mix
 #     C = (net['Cs'][0,0].dot(mix1)) + (net['Cs'][0,1].dot((mix2)))
+    leak = leakrate * net['p']['LR']
     C = np.zeros_like(net['Cs'][0,0])
     for i_morph, morph in enumerate(mixArray):
         C = C + (net['Cs'][0,i_morph].dot( morph ))
@@ -85,7 +86,7 @@ def iterateGenerator(net, state, mixArray, excitation):
     #update reservoir
     state['xOld'] = state['x']
     Wtarget = Wsr.dot(state['x'])
-    state['x'] = ((1.0-net['p']['LR']) * state['xOld']) + (net['p']['LR'] * np.tanh(Wtarget + net['net']['Wbias']))
+    state['x'] = ((1.0-leak) * state['xOld']) + (leak * np.tanh(Wtarget + net['net']['Wbias']))
     #apply mixed conceptor
     state['x'] = C.dot(state['x'])
     #compute output layer

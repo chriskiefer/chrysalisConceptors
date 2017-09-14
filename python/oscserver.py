@@ -8,8 +8,8 @@ import sys
 
 
 class MyServer(ServerThread):
-    def __init__(self, targetPort, onExit):
-        ServerThread.__init__(self, 57400)
+    def __init__(self, targetPort, recvPort, onExit):
+        ServerThread.__init__(self, recvPort)
         print("server created")
         self.onExit = onExit
         try:
@@ -34,7 +34,8 @@ class MyServer(ServerThread):
     def conceptor_callback(self, path, args):
         ind = args[0]
 #        print("received message ",path," with arguments: ", f)
-        value = self.onConceptorStore(ind)
+        if self.onConceptorStore != None:
+            value = self.onConceptorStore(ind)
         #send(self.target, "/output", value)
         
     @make_method('/input', 'if')
@@ -42,7 +43,8 @@ class MyServer(ServerThread):
         ind = args[0]
         f = args[1]
         #print("received input message ",path," with arguments: ", ind, f)
-        value = self.onInput(ind,f)
+        if self.onInput != None:
+            value = self.onInput(ind,f)
         #send(self.target, "/output", value)
 
     @make_method('/spectralradius', 'if')
@@ -50,7 +52,17 @@ class MyServer(ServerThread):
         ind = args[0]
         f = args[1]
 #        print("received message ",path," with arguments: ", f)
-        value = self.onSpectral(ind,f)
+        if self.onSpectral != None:
+            value = self.onSpectral(ind,f)
+        #send(self.target, "/output", value)
+
+    @make_method('/leakrate', 'if')
+    def leak_callback(self, path, args):
+        ind = args[0]
+        f = args[1]
+#        print("received message ",path," with arguments: ", f)
+        if self.onLeakrate != None:
+            value = self.onLeakrate(ind,f)
         #send(self.target, "/output", value)
 
     @make_method('/morph', 'if')
@@ -58,7 +70,8 @@ class MyServer(ServerThread):
         ind = args[0]
         f = args[1]
 #        print("received message ",path," with arguments: ", f)
-        value = self.onMorph(ind,f)
+        if self.onMorph != None:
+            value = self.onMorph(ind,f)
         #send(self.target, "/output", value)
 
     @make_method('/exit', None)
@@ -73,14 +86,14 @@ class MyServer(ServerThread):
         print("received unknown message ", path, args)
 
 
-def makeOSCServer(targetPort,onExit):
+def makeOSCServer(targetPort,recvPort,onExit):
     try:
         server.free()
     except:
         pass
 
     try:
-        server = MyServer(targetPort,onExit)
+        server = MyServer(targetPort,recvPort,onExit)
     except err:
         print(str(err))
 
