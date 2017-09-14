@@ -45,6 +45,7 @@ source <dirname>/bin/activate
     Cython
     pyliblo
     dill
+    numba
 ```
 
 * Start the jupyter notebook (browserbased interactive editor)
