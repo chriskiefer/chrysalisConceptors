@@ -17,10 +17,10 @@ Python3 is used within a virtual environment, to keep it contained. We use jupyt
 
 Steps for the setup are:
 
-* On Linux (Debian/Ubuntu) install the python3-dev files (needed for pyliblo below) and virtualenv
+* On Linux (Debian/Ubuntu) install the python3-dev files, liblo-dev (needed for pyliblo below) and virtualenv
 
 ```
-sudo apt-get install python3-dev virtualenv
+sudo apt-get install python3-dev virtualenv liblo-dev
 ```
 
 * make a virtualenv - just making it (I've called mine `env`)
