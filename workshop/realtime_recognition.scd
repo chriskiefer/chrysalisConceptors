@@ -18,7 +18,7 @@ OSCdef( \x1, { |data,time,src|  data.postln; }, '/x/1' );
 
 OSCdef( \x1 ).free;
 
-x.removeNode(41);
+// x.removeNode(41);
 x.addExpected( 41, \evidence, 4 );
 
 OSCdef( \evidence, { |data,time,src| x.setData( 41, data.copyToEnd(1) ) }, '/evidence' );
@@ -31,7 +31,7 @@ x.nodes[41].datamonitor.plotter.specs_( [-50,60].asSpec );
 
 // let's look at the difference!
 
-x.removeNode( 51 );
+// x.removeNode( 51 );
 x.addExpected( 51, \eviDifference, 4 );
 (
 x.nodes[41].action = { |data|
