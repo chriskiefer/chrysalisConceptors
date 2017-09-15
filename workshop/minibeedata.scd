@@ -13,16 +13,16 @@ OSCdef( \minibeeprivate, { |data,time,src| [data,time,src].postln; }, '/minibee/
 // netadresses to use:
 (
 ~netAddresses = IdentityDictionary[
-	\marije -> NetAddr.new( "127.0.0.1", 57120 ),
-	\chris -> NetAddr.new( "127.0.0.1", 57120 ),
-	\alice -> NetAddr.new( "127.0.0.1", 57120 ),
-	\rutz -> NetAddr.new( "127.0.0.1", 57120 ),
+	\group1 -> NetAddr.new( "127.0.0.1", 57120 ),
+	\group2 -> NetAddr.new( "127.0.0.1", 57120 ),
+	\group3 -> NetAddr.new( "127.0.0.1", 57120 ),
+	\group4 -> NetAddr.new( "127.0.0.1", 57120 ),
 ];
 );
 
 // forward the data:
-OSCdef( \minibee1, { |data,time,src| ~netAddresses[ \marije ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 1 ] );
-OSCdef( \minibee2, { |data,time,src| ~netAddresses[ \marije ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 2 ] );
-OSCdef( \minibee3, { |data,time,src| ~netAddresses[ \marije ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 3 ] );
-OSCdef( \minibee4, { |data,time,src| ~netAddresses[ \marije ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 4 ] );
-OSCdef( \minibee5, { |data,time,src| ~netAddresses[ \marije ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 5 ] );
+OSCdef( \minibee1, { |data,time,src| ~netAddresses[ \group1 ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 1 ] );
+OSCdef( \minibee2, { |data,time,src| ~netAddresses[ \group2 ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 2 ] );
+OSCdef( \minibee3, { |data,time,src| ~netAddresses[ \group3 ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 3 ] );
+// OSCdef( \minibee4, { |data,time,src| ~netAddresses[ \marije ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 4 ] );
+OSCdef( \minibee5, { |data,time,src| ~netAddresses[ \group4 ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 5 ] );
