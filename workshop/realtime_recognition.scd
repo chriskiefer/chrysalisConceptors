@@ -6,7 +6,7 @@
 n = NetAddr.new( "127.0.0.1", 57400 ); // python's address
 
 // this is the maxvalue that we calculated in python
-~maxValue = 0.0516839488978;
+~maxValue = 0.0672786717128;
 
 x.nodes[31].action = { |data| n.sendMsg( '/input', 0, (data[0]/~maxValue * 2 - 1); ); }; // second argument 0 is just an index; the code in python is made so that it can support multiple networks
 

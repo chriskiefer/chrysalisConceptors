@@ -8,13 +8,13 @@ Quarks.install( "DataNetwork" );
 NetAddr.myIP;
 
 // receiving data via osc (forwarded from Marije's computer)
-OSCdef( \minibeedata, { |data,time,src|  data.postln; }, '/minibee/data' );
+OSCdef( \minibeedata, { |data,time,src|  data.postln; }, '/minibee/data', argTemplate: [ 5 ] );
 
 // a SWDataNetwork is a hub for data with lots of useful extra functions like realtime plotting, simple data analysis, etc.
 x = SWDataNetwork.new;
 x.addExpected( 1, \acceleration, 3 ); // create a node with ID=1, name=\acceleration and 3 data streams
 
-OSCdef( \minibeedata, { |data,time,src| x.setData(1, data.copyToEnd(2) ); }, '/minibee/data' ); // redirect the incoming OSC data to the node we made.
+OSCdef( \minibeedata, { |data,time,src| x.setData(1, data.copyToEnd(2) ); }, '/minibee/data', argTemplate: [ 5 ] ); // redirect the incoming OSC data to the node we made.
 
 x.makeNodeGui; // makes a GUI of the datanetwork.
 // click on the button [ > ] to see the individual datastreams - click on [ Mon ] to have a realtime plot
@@ -67,7 +67,7 @@ Tdef( \recordGesture, {
 );
 
 (
-~counter = 0;
+~counter = 4;
 // function to write to file in a format that can be read into python:
 ~writeGestureToFile = { |gesture|
 	var file = File.new( ("gesturedata_" ++ ~counter ++ ".txt").resolveRelative, "w" );

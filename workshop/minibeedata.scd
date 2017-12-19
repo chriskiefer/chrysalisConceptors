@@ -3,7 +3,8 @@
 ~configFile = "configuration_minibee.xml".resolveRelative;
 ~mbeePort = "/dev/serial/by-id/usb-FTDI_FT231X_USB_UART_DA01MBBJ-if00-port0";
 ("minibee2osc -c" + ~configFile + "-s" + ~mbeePort + "-p" + NetAddr.langPort ).runInTerminal;
-
+);
+(
 OSCdef( \minibeedata, { |data,time,src|  data.postln; }, '/minibee/data' );
 OSCdef( \minibeeinfo, { |data,time,src| [data,time,src].postln; }, '/minibee/info' );
 OSCdef( \minibeestatus, { |data,time,src| [data,time,src].postln; }, '/minibee/status' );
@@ -13,10 +14,10 @@ OSCdef( \minibeeprivate, { |data,time,src| [data,time,src].postln; }, '/minibee/
 // netadresses to use:
 (
 ~netAddresses = IdentityDictionary[
-	\group1 -> NetAddr.new( "127.0.0.1", 57120 ),
-	\group2 -> NetAddr.new( "127.0.0.1", 57120 ),
-	\group3 -> NetAddr.new( "127.0.0.1", 57120 ),
-	\group4 -> NetAddr.new( "127.0.0.1", 57120 ),
+	\group1 -> NetAddr.new( "192.168.0.104", 57120 ), // hanns holger
+	\group2 -> NetAddr.new( "192.168.0.106", 57120 ), //
+	\group3 -> NetAddr.new( "192.168.0.103", 57120 ), // dan
+	\group4 -> NetAddr.new( "192.168.0.100", 57120 ),
 ];
 );
 
@@ -25,4 +26,8 @@ OSCdef( \minibee1, { |data,time,src| ~netAddresses[ \group1 ].sendMsg( *data ); 
 OSCdef( \minibee2, { |data,time,src| ~netAddresses[ \group2 ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 2 ] );
 OSCdef( \minibee3, { |data,time,src| ~netAddresses[ \group3 ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 3 ] );
 // OSCdef( \minibee4, { |data,time,src| ~netAddresses[ \marije ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 4 ] );
-OSCdef( \minibee5, { |data,time,src| ~netAddresses[ \group4 ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 5 ] );
+OSCdef( \minibee5, { |data,time,src| ~netAddresses[ \group ].sendMsg( *data ); }, '/minibee/data', argTemplate: [ 5 ] );
+
+OSCdef( \minibeedata, { |data,time,src|  data.postln; }, '/minibee/data' ).free
+
+OSCdef( \minibee5 ).free;

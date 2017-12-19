@@ -10,7 +10,7 @@
    <minibee caps="1" configuration="6" id="3" libversion="7" name="stretchtest3" revision="D" serial="0013A20040C1816C">
     </minibee>
 
-   <minibee caps="1" configuration="6" id="4" libversion="8" name="vibro" revision="D" serial="0013A20040C18150">
+   <minibee caps="1" configuration="5" id="4" libversion="8" name="vibro" revision="D" serial="0013A20040C18150">
     </minibee>
 
    <minibee caps="1" configuration="6" id="5" libversion="8" name="wezenctl" revision="D" serial="0013A20040A16A57">
@@ -21,6 +21,20 @@
     	<pin config="TWIClock" id="A5" />
     	<twi id="1" device="ADXL345" name="accelero" />
     </configuration>
+
+  <configuration id="5" message_interval="20" name="vibrocue" redundancy="3" samples_per_message="1">
+	    <pin config="TWIData" id="A4" />
+    	<pin config="TWIClock" id="A5" />
+    	<twi id="1" device="ADXL345" name="accelero" />
+	<customconf>
+	    <data id="0" name="vibrating" offset="0" scale="1" size="1"/>
+        <data id="1" name="intensity1" offset="0" scale="1" size="1"/>
+        <data id="2" name="intensity2" offset="0" scale="1" size="1"/>
+        <data id="3" name="pattern" offset="0" scale="1" size="1"/>
+        <data id="4" name="duration" offset="0" scale="1" size="1"/>
+        <data id="5" name="pIndex" offset="0" scale="1" size="1"/>
+	</customconf>
+  </configuration>
 
   </hive>
 </xml>

@@ -1,6 +1,6 @@
 (
-w = Window.new("gesture", Rect(0,0, 200, 200 ) );
-~gestBox = StaticText.new( w, Rect( 0, 0, 200, 200 ) );
+w = Window.new("gesture", Rect(0,0, 500, 500 ) );
+~gestBox = StaticText.new( w, Rect( 0, 0, 500, 500 ) );
 ~gestBox.background_( Color.black );
 ~gestBox.align_( \center );
 w.front;
@@ -8,8 +8,8 @@ w.onClose_( { Tdef( \indicateGesture ).stop; } );
 );
 
 // tune these two: (first value is the baseline difference; 2nd value is the maximum/minimum)
-~diffSpec1 = [0, -3 ].asSpec;
-~diffSpec2 = [0, 3 ].asSpec;
+~diffSpec1 = [0, -1.5 ].asSpec;
+~diffSpec2 = [0, 1 ].asSpec;
 
 (
 Tdef( \indicateGesture, {
