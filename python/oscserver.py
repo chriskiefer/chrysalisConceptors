@@ -47,6 +47,13 @@ class MyServer(ServerThread):
             value = self.onInput(ind,f)
         #send(self.target, "/output", value)
 
+    @make_method('/accelero', 'fff')
+    def input_callback(self, path, args):
+        #print("received input message ",path," with arguments: ", ind, f)
+        if self.onAccelero != None:
+            value = self.onAccelero(args)
+        #send(self.target, "/output", value)
+
     @make_method('/spectralradius', 'if')
     def spectral_callback(self, path, args):
         ind = args[0]
