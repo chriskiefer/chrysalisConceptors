@@ -1,4 +1,4 @@
-~configFile = "/home/nescivi/git/projects/chrysalis/minibee2osc/configuration_stretch.xml".resolveRelative;
+~configFile = "/home/nescivi/git/projects/chrysalis/minibee2osc/configuration_stretch2.xml".resolveRelative;
 ~mbeePort = "/dev/serial/by-id/usb-FTDI_FT231X_USB_UART_DA01MBBJ-if00-port0";
 // ~mbeePort = "/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A800f7Ue-if00-port0 ";
 ("minibee2osc -c" + ~configFile + "-s" + ~mbeePort + "-p" + NetAddr.langPort ).runInTerminal;
@@ -49,6 +49,8 @@ OSCdef( \minibeedata, { |data,time,src|
 
 (
 x.addExpected( 300, \buttons, 5 );
+x.addExpected( 301, \buttonAcc, 3 );
+
 x.add( \duim, [300,3] );
 x.add( \wijs, [300,4] );
 x.add( \middel, [300,2] );
@@ -56,9 +58,25 @@ x.add( \ring, [300,1] );
 x.add( \pink, [300,0] );
 OSCdef( \minibeedata5, { |data,time,src|
 	// data.postln;
-	x.setData( \buttons, 1- data.copyToEnd( 2 ) );
+	x.setData( \buttons, 1- (data.copyRange( 2,6 )) );
+	x.setData( \buttonAcc, 1- (data.copyRange( 7,9 )) );
 }, '/minibee/data', NetAddr.new( "127.0.0.1", 57600 ), argTemplate: [5] );
 );
+
+(
+x.addHook( 301, {
+	x.addExpected( 302, \butAccMean, 3 );
+	x.addExpected( 303, \butAccDev, 3 );
+	x.nodes[301].createBus(s);
+	~meanAcceleroBut = MeanNode.new( 302, x, x.nodes[301].bus, s ).set( \length, 200 );
+	fork{
+		1.0.wait;
+		~meanAcceleroBut.start;
+	};
+	x.nodes[301].action = { |data| x.setData( 303, data - x.nodes[302].data ); };
+});
+);
+
 
 (
 x.addExpected( 310, \vibro, 6 );
@@ -115,4 +133,8 @@ fork{
 };
 );
 
-// x.makeNodeGui
+//
+x.makeNodeGui
+
+//
+OSCdef( \minibeedata ).free;

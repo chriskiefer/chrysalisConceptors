@@ -10,7 +10,10 @@
 ~jupyter2 = NetAddr.new( "127.0.0.1", 57401 );
 
 (
+s.options.numControlBusChannels_( 16384 * 4 );
+s.options.numWireBufs_( 512 * 64 );
 s.options.numOutputBusChannels_(10);
+
 s.waitForBoot({
 	(~basePath +/+ "sound_wavetables.scd").load;
 	(~basePath +/+ "plotting.scd").load;

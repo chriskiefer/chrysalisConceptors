@@ -23,6 +23,16 @@ Ndef( \testSound, { WhiteNoise.ar( 0.2 ) } ).play(6)
 Ndef( \testSound, { WhiteNoise.ar( 0.2 ) } ).play(7)
 Ndef( \testSound, { WhiteNoise.ar( 0.2 ) } ).stop
 Ndef( \testSound ).clear;
+
+ 	(
+34	+	Ndef( \testSound, {
+35	+		var sig = WhiteNoise.ar( 1 );
+36	+		4.do{
+37	+			sig = LPF.ar( sig, 150)
+38	+		};
+39	+		sig*5;
+40	+	} ).play(8)
+41	+	);
 */
 // tryout
 
