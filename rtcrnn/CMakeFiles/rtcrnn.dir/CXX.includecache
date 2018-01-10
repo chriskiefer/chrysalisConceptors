@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/ck84/hd2/virtualenvs/env3/chrysalisConceptors/rtcrnn/main.cpp
+stdio.h
+-
+stdlib.h
+-
+math.h
+-
+
