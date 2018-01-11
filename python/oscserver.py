@@ -98,6 +98,20 @@ class MyServer(ServerThread):
             value = self.onRecordOff()
         #send(self.target, "/output", value)
 
+    @make_method('/perform/on', 'i') # sends index
+    def perform_on_callback(self, path, args):
+        #print("received input message ",path," with arguments: ", ind, f)
+        if self.onPerformOn != None:
+            value = self.onPerformOn( args[0] )
+        #send(self.target, "/output", value)
+
+    @make_method('/perform/off', '')
+    def perform_off_callback(self, path, args):
+        #print("received input message ",path," with arguments: ", ind, f)
+        if self.onPerformOff != None:
+            value = self.onPerformOff()
+        #send(self.target, "/output", value)
+
 
     @make_method('/conceptor/store', 'i')
     def conceptor_callback(self, path, args):
